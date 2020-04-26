@@ -1,5 +1,6 @@
 use rand::Rng;
 use std::io;
+use tic_tac_toe;
 
 fn print_board(board: [u32; 9]) {
     for i in 0..3 {
@@ -10,31 +11,6 @@ fn print_board(board: [u32; 9]) {
         println!("|");
     }
     println!("+---+---+---+");
-}
-
-fn extract_position(input: String) -> Result<usize, String> {
-    let input_chars: Vec<char> = input.chars().collect();
-
-    if input_chars.len() < 3 {
-        return Err("Invalid position! You moron!".to_string());
-    }
-
-    let i = input_chars[0].to_digit(10);
-    let j = input_chars[2].to_digit(10);
-
-    if let Some(x) = i {
-        if let Some(y) = j {
-            if x < 3 && y < 3 {
-                return Ok((x * 3 + y) as usize);
-            } else {
-                return Err("Invalid position! You moron!".to_string());
-            }
-        } else {
-            return Err("Invalid position! You moron!".to_string());
-        }
-    } else {
-        return Err("Invalid position! You moron!".to_string());
-    }
 }
 
 fn main() {
@@ -51,7 +27,7 @@ fn main() {
             .read_line(&mut game_move)
             .expect("Failed to read line!");
 
-        let result = extract_position(game_move);
+        let result = tic_tac_toe::extract_position(game_move);
         match result {
             Ok(position) => board[position] = 1,
             Err(error) => println!("{}", error),
