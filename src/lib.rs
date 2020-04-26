@@ -47,8 +47,26 @@ pub fn empty_board() -> [Player; 9] {
 }
 
 pub fn check_winner(board: [Player; 9]) -> Player {
-    if board[0] == board[1] && board[2] == board[1] {
+    for base in 0..3 {
+        let root = base * 3;
+        if board[root] == board[root + 1]
+            && board[root] == board[root + 2]
+            && board[root] != Player::Nobody
+        {
+            return board[root];
+        }
+        if board[base] == board[base + 3]
+            && board[base] == board[base + 6]
+            && board[base] != Player::Nobody
+        {
+            return board[base];
+        }
+    }
+    if board[0] == board[4] && board[0] == board[8] && board[0] != Player::Nobody {
         return board[0];
+    }
+    if board[2] == board[4] && board[2] == board[6] && board[2] != Player::Nobody {
+        return board[6];
     }
     Player::Nobody
 }

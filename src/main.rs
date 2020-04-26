@@ -16,11 +16,10 @@ fn print_board(board: [Player; 9]) {
 
 fn main() {
     let mut board: [Player; 9] = tic_tac_toe::empty_board();
-    let mut finished = false;
     println!("Welcome to old woman's game!\n");
     print_board(board);
 
-    while !finished {
+    loop {
         println!("What's your move?");
         let mut game_move = String::new();
 
@@ -30,20 +29,33 @@ fn main() {
 
         let result = tic_tac_toe::extract_position(game_move);
         match result {
-            Ok(position) => board[position] = Player::Human,
+            Ok(position) => {
+                board[position] = Player::Human;
+                print_board(board);
+
+                let computer_move_x = rand::thread_rng().gen_range(0, 3);
+                let computer_move_y = rand::thread_rng().gen_range(0, 3);
+                let computer_position = (computer_move_x * 3 + computer_move_y) as usize;
+                board[computer_position] = Player::Computer;
+
+                println!("Ok, my turn.");
+                print_board(board);
+
+                match tic_tac_toe::check_winner(board) {
+                    Player::Human => {
+                        println!("Congratulations! You have saved us from extinction!");
+                        break;
+                    }
+                    Player::Computer => {
+                        println!("You lost! Humanity is doomed now...");
+                        break;
+                    }
+                    Player::Nobody => {
+                        println!("Nobody won just yet. The battle rages on!");
+                    }
+                }
+            }
             Err(error) => println!("{}", error),
         };
-
-        print_board(board);
-
-        let computer_move_x = rand::thread_rng().gen_range(0, 3);
-        let computer_move_y = rand::thread_rng().gen_range(0, 3);
-        let computer_position = (computer_move_x * 3 + computer_move_y) as usize;
-        board[computer_position] = Player::Computer;
-
-        println!("Ok, my turn.");
-        print_board(board);
-
-        finished = true;
     }
 }

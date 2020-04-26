@@ -69,47 +69,171 @@ fn check_winner_computer_wins_first_row() {
         _ => assert!(false),
     }
 }
-// #[test]
-// fn check_winner_human_wins_second_row() {
-//     let board = [0, 0, 0, 1, 1, 1, 0, 0, 0];
-//     match tic_tac_toe::check_winner(board) {
-//         Player::Human => assert!(true),
-//         _ => assert!(false),
-//     }
-// }
 
-// #[test]
-// fn check_winner_human_wins_third_row() {
-//     let board = [0, 0, 0, 0, 0, 0, 1, 1, 1];
-//     match tic_tac_toe::check_winner(board) {
-//         Player::Human => assert!(true),
-//         _ => assert!(false),
-//     }
-// }
+#[test]
+fn check_winner_human_wins_second_row() {
+    let mut board = tic_tac_toe::empty_board();
+    board[3] = Player::Human;
+    board[4] = Player::Human;
+    board[5] = Player::Human;
+    match tic_tac_toe::check_winner(board) {
+        Player::Human => assert!(true),
+        _ => assert!(false),
+    }
+}
 
-// #[test]
-// fn check_winner_human_wins_first_column() {
-//     let board = [1, 0, 0, 1, 0, 0, 1, 0, 0];
-//     match tic_tac_toe::check_winner(board) {
-//         Player::Human => assert!(true),
-//         _ => assert!(false),
-//     }
-// }
+#[test]
+fn check_winner_computer_wins_second_row() {
+    let mut board = tic_tac_toe::empty_board();
+    board[3] = Player::Computer;
+    board[4] = Player::Computer;
+    board[5] = Player::Computer;
+    match tic_tac_toe::check_winner(board) {
+        Player::Computer => assert!(true),
+        _ => assert!(false),
+    }
+}
 
-// #[test]
-// fn check_winner_human_wins_second_column() {
-//     let board = [0, 1, 0, 0, 1, 0, 0, 1, 0];
-//     match tic_tac_toe::check_winner(board) {
-//         Player::Human => assert!(true),
-//         _ => assert!(false),
-//     }
-// }
+#[test]
+fn check_winner_human_wins_third_row() {
+    let mut board = tic_tac_toe::empty_board();
+    board[6] = Player::Human;
+    board[7] = Player::Human;
+    board[8] = Player::Human;
+    match tic_tac_toe::check_winner(board) {
+        Player::Human => assert!(true),
+        _ => assert!(false),
+    }
+}
 
-// #[test]
-// fn check_winner_human_wins_third_column() {
-//     let board = [0, 0, 1, 0, 0, 1, 0, 0, 1];
-//     match tic_tac_toe::check_winner(board) {
-//         Player::Human => assert!(true),
-//         _ => assert!(false),
-//     }
-// }
+#[test]
+fn check_winner_computer_wins_third_row() {
+    let mut board = tic_tac_toe::empty_board();
+    board[6] = Player::Computer;
+    board[7] = Player::Computer;
+    board[8] = Player::Computer;
+    match tic_tac_toe::check_winner(board) {
+        Player::Computer => assert!(true),
+        _ => assert!(false),
+    }
+}
+
+#[test]
+fn check_winner_human_wins_first_column() {
+    let mut board = tic_tac_toe::empty_board();
+    board[0] = Player::Human;
+    board[3] = Player::Human;
+    board[6] = Player::Human;
+    match tic_tac_toe::check_winner(board) {
+        Player::Human => assert!(true),
+        _ => assert!(false),
+    }
+}
+
+#[test]
+fn check_winner_computer_wins_first_column() {
+    let mut board = tic_tac_toe::empty_board();
+    board[0] = Player::Computer;
+    board[3] = Player::Computer;
+    board[6] = Player::Computer;
+    match tic_tac_toe::check_winner(board) {
+        Player::Computer => assert!(true),
+        _ => assert!(false),
+    }
+}
+
+#[test]
+fn check_winner_human_wins_second_column() {
+    let mut board = tic_tac_toe::empty_board();
+    board[1] = Player::Human;
+    board[4] = Player::Human;
+    board[7] = Player::Human;
+    match tic_tac_toe::check_winner(board) {
+        Player::Human => assert!(true),
+        _ => assert!(false),
+    }
+}
+
+#[test]
+fn check_winner_computer_wins_second_column() {
+    let mut board = tic_tac_toe::empty_board();
+    board[1] = Player::Computer;
+    board[4] = Player::Computer;
+    board[7] = Player::Computer;
+    match tic_tac_toe::check_winner(board) {
+        Player::Computer => assert!(true),
+        _ => assert!(false),
+    }
+}
+
+#[test]
+fn check_winner_human_wins_third_column() {
+    let mut board = tic_tac_toe::empty_board();
+    board[2] = Player::Human;
+    board[5] = Player::Human;
+    board[8] = Player::Human;
+    match tic_tac_toe::check_winner(board) {
+        Player::Human => assert!(true),
+        _ => assert!(false),
+    }
+}
+
+#[test]
+fn check_winner_computer_wins_third_column() {
+    let mut board = tic_tac_toe::empty_board();
+    board[2] = Player::Computer;
+    board[5] = Player::Computer;
+    board[8] = Player::Computer;
+    match tic_tac_toe::check_winner(board) {
+        Player::Computer => assert!(true),
+        _ => assert!(false),
+    }
+}
+
+#[test]
+fn check_winner_human_wins_first_diagonal() {
+    let mut board = tic_tac_toe::empty_board();
+    board[0] = Player::Human;
+    board[4] = Player::Human;
+    board[8] = Player::Human;
+    match tic_tac_toe::check_winner(board) {
+        Player::Human => assert!(true),
+        _ => assert!(false),
+    }
+}
+
+#[test]
+fn check_winner_computer_wins_first_diagonal() {
+    let mut board = tic_tac_toe::empty_board();
+    board[0] = Player::Computer;
+    board[4] = Player::Computer;
+    board[8] = Player::Computer;
+    match tic_tac_toe::check_winner(board) {
+        Player::Computer => assert!(true),
+        _ => assert!(false),
+    }
+}
+
+#[test]
+fn check_winner_human_wins_second_diagonal() {
+    let mut board = tic_tac_toe::empty_board();
+    board[2] = Player::Human;
+    board[4] = Player::Human;
+    board[6] = Player::Human;
+    match tic_tac_toe::check_winner(board) {
+        Player::Human => assert!(true),
+        _ => assert!(false),
+    }
+}
+
+#[test]
+fn check_winner_computer_wins_second_diagonal() {
+    let mut board = tic_tac_toe::empty_board();
+    board[2] = Player::Computer;
+    board[4] = Player::Computer;
+    board[6] = Player::Computer;
+    match tic_tac_toe::check_winner(board) {
+        Player::Computer => assert!(true),
+        _ => assert!(false),
+    }
+}
