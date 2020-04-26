@@ -1,3 +1,5 @@
+use std::fmt::{self, Display, Formatter};
+
 pub fn extract_position(input: String) -> Result<usize, String> {
     let input_chars: Vec<char> = input.chars().collect();
 
@@ -11,14 +13,42 @@ pub fn extract_position(input: String) -> Result<usize, String> {
     if let Some(x) = i {
         if let Some(y) = j {
             if x < 3 && y < 3 {
-                return Ok((x * 3 + y) as usize);
+                Ok((x * 3 + y) as usize)
             } else {
-                return Err("Invalid position! You moron!".to_string());
+                Err("Invalid position! You moron!".to_string())
             }
         } else {
-            return Err("Invalid position! You moron!".to_string());
+            Err("Invalid position! You moron!".to_string())
         }
     } else {
-        return Err("Invalid position! You moron!".to_string());
+        Err("Invalid position! You moron!".to_string())
     }
+}
+
+#[derive(Clone, Copy, PartialEq)]
+pub enum Player {
+    Human,
+    Computer,
+    Nobody,
+}
+
+impl Display for Player {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match *self {
+            Player::Human => write!(f, "X"),
+            Player::Computer => write!(f, "O"),
+            Player::Nobody => write!(f, " "),
+        }
+    }
+}
+
+pub fn empty_board() -> [Player; 9] {
+    [Player::Nobody; 9]
+}
+
+pub fn check_winner(board: [Player; 9]) -> Player {
+    if board[0] == board[1] && board[2] == board[1] {
+        return board[0];
+    }
+    Player::Nobody
 }
