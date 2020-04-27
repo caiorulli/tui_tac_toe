@@ -3,7 +3,8 @@ use tic_tac_toe::Player;
 
 #[test]
 fn extract_position_success() {
-    let result = tic_tac_toe::extract_position("1 1".to_string());
+    let board = tic_tac_toe::empty_board();
+    let result = tic_tac_toe::extract_position(board, "1 1".to_string());
     match result {
         Ok(x) => assert_eq!(x, 4),
         Err(error) => panic!(error),
@@ -12,7 +13,8 @@ fn extract_position_success() {
 
 #[test]
 fn extract_position_failure_boundary() {
-    let result = tic_tac_toe::extract_position("9 8".to_string());
+    let board = tic_tac_toe::empty_board();
+    let result = tic_tac_toe::extract_position(board, "9 8".to_string());
     match result {
         Ok(x) => panic!(x),
         Err(error) => assert_eq!(error, "Invalid position! You moron!"),
@@ -21,7 +23,8 @@ fn extract_position_failure_boundary() {
 
 #[test]
 fn extract_position_failure_lack_of_value() {
-    let result = tic_tac_toe::extract_position("0".to_string());
+    let board = tic_tac_toe::empty_board();
+    let result = tic_tac_toe::extract_position(board, "0".to_string());
     match result {
         Ok(x) => panic!(x),
         Err(error) => assert_eq!(error, "Invalid position! You moron!"),
@@ -29,8 +32,19 @@ fn extract_position_failure_lack_of_value() {
 }
 
 #[test]
+fn extract_position_failure_already_filled() {
+    let mut board = tic_tac_toe::empty_board();
+    board[8] = Player::Computer;
+    let result = tic_tac_toe::extract_position(board, "2 2".to_string());
+    match result {
+        Ok(x) => panic!(x),
+        Err(error) => assert_eq!(error, "Invalid position! You moron!"),
+    }
+}
+#[test]
 fn extract_position_failure_not_digit() {
-    let result = tic_tac_toe::extract_position("e".to_string());
+    let board = tic_tac_toe::empty_board();
+    let result = tic_tac_toe::extract_position(board, "e".to_string());
     match result {
         Ok(x) => panic!(x),
         Err(error) => assert_eq!(error, "Invalid position! You moron!"),
