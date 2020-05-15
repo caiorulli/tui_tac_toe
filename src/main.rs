@@ -1,5 +1,11 @@
 use rand::Rng;
 use std::io;
+use termion::raw::IntoRawMode;
+use tui::backend::TermionBackend;
+use tui::layout::{Constraint, Direction, Layout};
+use tui::widgets::{Block, Borders, Widget};
+use tui::Terminal;
+
 use tic_tac_toe;
 use tic_tac_toe::Player;
 
@@ -25,7 +31,7 @@ fn make_computer_move(board: [Player; 9]) -> usize {
     }
 }
 
-fn main() {
+fn old_main() {
     let mut board: [Player; 9] = tic_tac_toe::empty_board();
     println!("Welcome to old woman's game!\nHere you will try to save humankind from being slaved by a mighty invincible artificial intelligence.\nGodspeed!\n");
     print_board(board);
@@ -66,4 +72,28 @@ fn main() {
             Err(error) => println!("{}", error),
         };
     }
+}
+
+fn main() -> Result<(), io::Error> {
+    let stdout = io::stdout().into_raw_mode()?;
+    let backend = TermionBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+    terminal.draw(|mut f| {
+        let chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .margin(1)
+            .constraints(
+                [
+                    Constraint::Percentage(10),
+                    Constraint::Percentage(80),
+                    Constraint::Percentage(10),
+                ]
+                .as_ref(),
+            )
+            .split(f.size());
+        let block = Block::default().title("Block").borders(Borders::ALL);
+        f.render_widget(block, chunks[0]);
+        let block = Block::default().title("Block 2").borders(Borders::ALL);
+        f.render_widget(block, chunks[1]);
+    })
 }
