@@ -1,17 +1,18 @@
 use rand::Rng;
+use std::io;
+use std::io::Write;
 use termion::clear;
 use termion::cursor;
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
-use std::io;
-use std::io::Write;
+use termion::raw::RawTerminal;
 
 use tic_tac_toe;
 use tic_tac_toe::Player;
 
 fn write_board(
-    stdout: &mut termion::raw::RawTerminal<std::io::Stdout>,
+    stdout: &mut RawTerminal<std::io::Stdout>,
     board: [Player; 9],
     position: (u16, u16),
     winner_status: &str,
@@ -60,34 +61,55 @@ fn main() -> Result<(), io::Error> {
             Key::Char('q') => {
                 write!(stdout, "{}{}", clear::All, cursor::Goto(1, 1)).unwrap();
                 break;
-            },
-            Key::Char('l') => position.0 += 4,
-            Key::Char('h') => position.0 -= 4,
-            Key::Char('j') => position.1 += 2,
-            Key::Char('k') => position.1 -= 2,
+            }
+            Key::Char('l') => {
+                if (position.0 - board_position.0) / 4 < 2 {
+                    position.0 += 4;
+                }
+            }
+            Key::Char('h') => {
+                if (position.0 - board_position.0) / 4 > 0 {
+                    position.0 -= 4;
+                }
+            }
+            Key::Char('j') => {
+                if (position.1 - board_position.1) / 2 < 2 {
+                    position.1 += 2;
+                }
+            }
+            Key::Char('k') => {
+                if (position.1 - board_position.1) / 2 > 0 {
+                    position.1 -= 2;
+                }
+            }
             Key::Char(' ') => {
                 let position_x = (position.0 - board_position.0) / 4;
                 let position_y = (position.1 - board_position.1) / 2;
                 let result: usize = (position_y * 3 + position_x) as usize;
-                board[result] = Player::Human;
-                board[make_computer_move(board)] = Player::Computer;
 
-                match tic_tac_toe::check_winner(board) {
-                    Player::Human => {
-                        winner_status = "Congratulations! You have saved us from extinction!";
-                        write_board(&mut stdout, board, position, winner_status);
-                        break;
-                    }
-                    Player::Computer => {
-                        winner_status = "You lost! Humanity is doomed now...";
-                        write_board(&mut stdout, board, position, winner_status);
-                        break;
-                    }
-                    Player::Nobody => {
-                        winner_status = "Nobody won just yet. The battle rages on!";
+                if board[result] == Player::Nobody {
+                    board[result] = Player::Human;
+                    board[make_computer_move(board)] = Player::Computer;
+
+                    match tic_tac_toe::check_winner(board) {
+                        Player::Human => {
+                            winner_status = "Congratulations! You have saved us from extinction!";
+                            write_board(&mut stdout, board, position, winner_status);
+                            write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
+                            break;
+                        }
+                        Player::Computer => {
+                            winner_status = "You lost! Humanity is doomed now...";
+                            write_board(&mut stdout, board, position, winner_status);
+                            write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
+                            break;
+                        }
+                        Player::Nobody => {
+                            winner_status = "Nobody won just yet. The battle rages on!";
+                        }
                     }
                 }
-            },
+            }
             _ => println!("General Kenobi!"),
         }
 
