@@ -1,5 +1,5 @@
 [package]
-name = "tic_tac_toe"
+name = "tui_tac_toe"
 version = "0.1.0"
 authors = ["Caio Rulli <caiorulli@gmail.com>"]
 edition = "2018"
@@ -8,5 +8,4 @@ edition = "2018"
 
 [dependencies]
 rand = "0.6.0"
-tui = "0.9"
 termion = "1.5"

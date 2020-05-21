@@ -8,8 +8,8 @@ use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use termion::raw::RawTerminal;
 
-use tic_tac_toe;
-use tic_tac_toe::Player;
+use tui_tac_toe;
+use tui_tac_toe::Player;
 
 fn write_board(
     stdout: &mut RawTerminal<std::io::Stdout>,
@@ -45,7 +45,7 @@ fn make_computer_move(board: [Player; 9]) -> usize {
 }
 
 fn main() -> Result<(), io::Error> {
-    let mut board = tic_tac_toe::empty_board();
+    let mut board = tui_tac_toe::empty_board();
 
     let stdin = io::stdin();
     let mut stdout = io::stdout().into_raw_mode().unwrap();
@@ -91,7 +91,7 @@ fn main() -> Result<(), io::Error> {
                     board[result] = Player::Human;
                     board[make_computer_move(board)] = Player::Computer;
 
-                    match tic_tac_toe::check_winner(board) {
+                    match tui_tac_toe::check_winner(board) {
                         Player::Human => {
                             winner_status = "Congratulations! You have saved us from extinction!";
                             write_board(&mut stdout, board, position, winner_status);
