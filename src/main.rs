@@ -11,6 +11,11 @@ use termion::raw::RawTerminal;
 use tui_tac_toe;
 use tui_tac_toe::Player;
 
+const WELCOME_MESSAGE: &str = "Welcome to old woman's game!\n\rHere you will try to save humankind from being enslaved by a\n\rmighty invincible artificial intelligence.\n\rGodspeed!\n\r\n\r\n\r";
+const PLAYER_WIN_MESSAGE: &str = "Congratulations! You have saved us from extinction!";
+const AI_WIN_MESSAGE: &str = "You lost! Humanity is doomed now...";
+const NO_WIN_MESSAGE: &str = "Nobody won just yet. The battle rages on!";
+
 fn write_board(
     stdout: &mut RawTerminal<std::io::Stdout>,
     board: [Player; 9],
@@ -18,7 +23,7 @@ fn write_board(
     winner_status: &str,
 ) {
     write!(stdout, "{}{}", clear::All, cursor::Goto(1, 1)).unwrap();
-    write!(stdout, "Welcome to old woman's game!\n\rHere you will try to save humankind from being enslaved by a\n\rmighty invincible artificial intelligence.\n\rGodspeed!\n\r\n\r\n\r")
+    write!(stdout, "{}", WELCOME_MESSAGE)
         .unwrap();
     for i in 0..3 {
         write!(stdout, "+---+---+---+\n\r").unwrap();
@@ -93,19 +98,19 @@ fn main() -> Result<(), io::Error> {
 
                     match tui_tac_toe::check_winner(board) {
                         Player::Human => {
-                            winner_status = "Congratulations! You have saved us from extinction!";
+                            winner_status = PLAYER_WIN_MESSAGE;
                             write_board(&mut stdout, board, position, winner_status);
                             write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
                             break;
                         }
                         Player::Computer => {
-                            winner_status = "You lost! Humanity is doomed now...";
+                            winner_status = AI_WIN_MESSAGE;
                             write_board(&mut stdout, board, position, winner_status);
                             write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
                             break;
                         }
                         Player::Nobody => {
-                            winner_status = "Nobody won just yet. The battle rages on!";
+                            winner_status = NO_WIN_MESSAGE;
                         }
                     }
                 }

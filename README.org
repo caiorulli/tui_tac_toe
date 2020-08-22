@@ -13,5 +13,4 @@ There are some tests! :D
 cargo test
 #+END_SRC
 
-I'll eventually migrate it to make use of tui-rs properly instead of just termion.
-When I do it I'll make sure to publish the binaries as well.
+Pretty much a work in progress. Lots of room for improvement! Feel free to contribute if you'd like to! :D
