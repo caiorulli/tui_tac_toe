@@ -17,56 +17,69 @@ impl Display for Player {
     }
 }
 
-pub fn empty_board() -> [Player; 9] {
-    [Player::Nobody; 9]
+#[derive(Debug, PartialEq)]
+pub struct Move {
+    pub x: usize,
+    pub y: usize,
 }
 
-pub fn extract_position(board: [Player; 9], input: String) -> Result<usize, String> {
-    let input_chars: Vec<char> = input.chars().collect();
+impl Move {
+    pub fn new(x: usize, y: usize) -> Result<Move, String> {
+        let result_move = Move { x, y };
+        if result_move.value() > 8 {
+            return Err("Invalid position! You moron!".to_string());
+        }
 
-    if input_chars.len() < 3 {
-        return Err("Invalid position! You moron!".to_string());
+        Ok(result_move)
     }
 
-    let i = input_chars[0].to_digit(10);
-    let j = input_chars[2].to_digit(10);
+    pub fn value(&self) -> usize {
+        self.y * 3 + self.x
+    }
+}
 
-    if let Some(x) = i {
-        if let Some(y) = j {
-            if x < 3 && y < 3 && board[(x * 3 + y) as usize] == Player::Nobody {
-                Ok((x * 3 + y) as usize)
-            } else {
-                Err("Invalid position! You moron!".to_string())
+pub struct Game {
+    pub board: [Player; 9],
+}
+
+impl Game {
+    pub fn new() -> Game {
+        Game {
+            board: [Player::Nobody; 9],
+        }
+    }
+
+    pub fn validate_move(&self, input: &Move) -> bool {
+        self.board[input.value()] == Player::Nobody
+    }
+
+    pub fn make_move(&mut self, input: Move, player: Player) {
+        self.board[input.value()] = player;
+    }
+
+    pub fn check_winner(&self) -> Player {
+        let board = self.board;
+        for base in 0..3 {
+            let root = base * 3;
+            if board[root] == board[root + 1]
+                && board[root] == board[root + 2]
+                && board[root] != Player::Nobody
+            {
+                return board[root];
             }
-        } else {
-            Err("Invalid position! You moron!".to_string())
+            if board[base] == board[base + 3]
+                && board[base] == board[base + 6]
+                && board[base] != Player::Nobody
+            {
+                return board[base];
+            }
         }
-    } else {
-        Err("Invalid position! You moron!".to_string())
-    }
-}
-
-pub fn check_winner(board: [Player; 9]) -> Player {
-    for base in 0..3 {
-        let root = base * 3;
-        if board[root] == board[root + 1]
-            && board[root] == board[root + 2]
-            && board[root] != Player::Nobody
-        {
-            return board[root];
+        if board[0] == board[4] && board[0] == board[8] && board[0] != Player::Nobody {
+            return board[0];
         }
-        if board[base] == board[base + 3]
-            && board[base] == board[base + 6]
-            && board[base] != Player::Nobody
-        {
-            return board[base];
+        if board[2] == board[4] && board[2] == board[6] && board[2] != Player::Nobody {
+            return board[6];
         }
+        Player::Nobody
     }
-    if board[0] == board[4] && board[0] == board[8] && board[0] != Player::Nobody {
-        return board[0];
-    }
-    if board[2] == board[4] && board[2] == board[6] && board[2] != Player::Nobody {
-        return board[6];
-    }
-    Player::Nobody
 }

@@ -1,30 +1,20 @@
 use tui_tac_toe;
+use tui_tac_toe::Game;
+use tui_tac_toe::Move;
 use tui_tac_toe::Player;
 
 #[test]
 fn extract_position_success() {
-    let board = tui_tac_toe::empty_board();
-    let result = tui_tac_toe::extract_position(board, "1 1".to_string());
+    let result = Move::new(1, 1);
     match result {
-        Ok(x) => assert_eq!(x, 4),
+        Ok(x) => assert_eq!(x, Move { x: 1, y: 1 }),
         Err(error) => panic!(error),
     }
 }
 
 #[test]
 fn extract_position_failure_boundary() {
-    let board = tui_tac_toe::empty_board();
-    let result = tui_tac_toe::extract_position(board, "9 8".to_string());
-    match result {
-        Ok(x) => panic!(x),
-        Err(error) => assert_eq!(error, "Invalid position! You moron!"),
-    }
-}
-
-#[test]
-fn extract_position_failure_lack_of_value() {
-    let board = tui_tac_toe::empty_board();
-    let result = tui_tac_toe::extract_position(board, "0".to_string());
+    let result = Move::new(9, 8);
     match result {
         Ok(x) => panic!(x),
         Err(error) => assert_eq!(error, "Invalid position! You moron!"),
@@ -33,28 +23,16 @@ fn extract_position_failure_lack_of_value() {
 
 #[test]
 fn extract_position_failure_already_filled() {
-    let mut board = tui_tac_toe::empty_board();
-    board[8] = Player::Computer;
-    let result = tui_tac_toe::extract_position(board, "2 2".to_string());
-    match result {
-        Ok(x) => panic!(x),
-        Err(error) => assert_eq!(error, "Invalid position! You moron!"),
-    }
-}
-#[test]
-fn extract_position_failure_not_digit() {
-    let board = tui_tac_toe::empty_board();
-    let result = tui_tac_toe::extract_position(board, "e".to_string());
-    match result {
-        Ok(x) => panic!(x),
-        Err(error) => assert_eq!(error, "Invalid position! You moron!"),
-    }
+    let mut game = Game::new();
+    game.board[8] = Player::Computer;
+    let result = Move::new(2, 2).unwrap();
+    assert_eq!(game.validate_move(&result), false);
 }
 
 #[test]
 fn check_winner_empty_board() {
-    let board = tui_tac_toe::empty_board();
-    match tui_tac_toe::check_winner(board) {
+    let game = Game::new();
+    match game.check_winner() {
         Player::Nobody => assert!(true),
         _ => assert!(false),
     }
@@ -62,11 +40,11 @@ fn check_winner_empty_board() {
 
 #[test]
 fn check_winner_human_wins_first_row() {
-    let mut board = tui_tac_toe::empty_board();
-    board[0] = Player::Human;
-    board[1] = Player::Human;
-    board[2] = Player::Human;
-    match tui_tac_toe::check_winner(board) {
+    let mut game = Game::new();
+    game.make_move(Move { x: 0, y: 0 }, Player::Human);
+    game.make_move(Move { x: 0, y: 1 }, Player::Human);
+    game.make_move(Move { x: 0, y: 2 }, Player::Human);
+    match game.check_winner() {
         Player::Human => assert!(true),
         _ => assert!(false),
     }
@@ -74,179 +52,11 @@ fn check_winner_human_wins_first_row() {
 
 #[test]
 fn check_winner_computer_wins_first_row() {
-    let mut board = tui_tac_toe::empty_board();
-    board[0] = Player::Computer;
-    board[1] = Player::Computer;
-    board[2] = Player::Computer;
-    match tui_tac_toe::check_winner(board) {
-        Player::Computer => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_human_wins_second_row() {
-    let mut board = tui_tac_toe::empty_board();
-    board[3] = Player::Human;
-    board[4] = Player::Human;
-    board[5] = Player::Human;
-    match tui_tac_toe::check_winner(board) {
-        Player::Human => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_computer_wins_second_row() {
-    let mut board = tui_tac_toe::empty_board();
-    board[3] = Player::Computer;
-    board[4] = Player::Computer;
-    board[5] = Player::Computer;
-    match tui_tac_toe::check_winner(board) {
-        Player::Computer => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_human_wins_third_row() {
-    let mut board = tui_tac_toe::empty_board();
-    board[6] = Player::Human;
-    board[7] = Player::Human;
-    board[8] = Player::Human;
-    match tui_tac_toe::check_winner(board) {
-        Player::Human => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_computer_wins_third_row() {
-    let mut board = tui_tac_toe::empty_board();
-    board[6] = Player::Computer;
-    board[7] = Player::Computer;
-    board[8] = Player::Computer;
-    match tui_tac_toe::check_winner(board) {
-        Player::Computer => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_human_wins_first_column() {
-    let mut board = tui_tac_toe::empty_board();
-    board[0] = Player::Human;
-    board[3] = Player::Human;
-    board[6] = Player::Human;
-    match tui_tac_toe::check_winner(board) {
-        Player::Human => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_computer_wins_first_column() {
-    let mut board = tui_tac_toe::empty_board();
-    board[0] = Player::Computer;
-    board[3] = Player::Computer;
-    board[6] = Player::Computer;
-    match tui_tac_toe::check_winner(board) {
-        Player::Computer => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_human_wins_second_column() {
-    let mut board = tui_tac_toe::empty_board();
-    board[1] = Player::Human;
-    board[4] = Player::Human;
-    board[7] = Player::Human;
-    match tui_tac_toe::check_winner(board) {
-        Player::Human => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_computer_wins_second_column() {
-    let mut board = tui_tac_toe::empty_board();
-    board[1] = Player::Computer;
-    board[4] = Player::Computer;
-    board[7] = Player::Computer;
-    match tui_tac_toe::check_winner(board) {
-        Player::Computer => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_human_wins_third_column() {
-    let mut board = tui_tac_toe::empty_board();
-    board[2] = Player::Human;
-    board[5] = Player::Human;
-    board[8] = Player::Human;
-    match tui_tac_toe::check_winner(board) {
-        Player::Human => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_computer_wins_third_column() {
-    let mut board = tui_tac_toe::empty_board();
-    board[2] = Player::Computer;
-    board[5] = Player::Computer;
-    board[8] = Player::Computer;
-    match tui_tac_toe::check_winner(board) {
-        Player::Computer => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_human_wins_first_diagonal() {
-    let mut board = tui_tac_toe::empty_board();
-    board[0] = Player::Human;
-    board[4] = Player::Human;
-    board[8] = Player::Human;
-    match tui_tac_toe::check_winner(board) {
-        Player::Human => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_computer_wins_first_diagonal() {
-    let mut board = tui_tac_toe::empty_board();
-    board[0] = Player::Computer;
-    board[4] = Player::Computer;
-    board[8] = Player::Computer;
-    match tui_tac_toe::check_winner(board) {
-        Player::Computer => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_human_wins_second_diagonal() {
-    let mut board = tui_tac_toe::empty_board();
-    board[2] = Player::Human;
-    board[4] = Player::Human;
-    board[6] = Player::Human;
-    match tui_tac_toe::check_winner(board) {
-        Player::Human => assert!(true),
-        _ => assert!(false),
-    }
-}
-
-#[test]
-fn check_winner_computer_wins_second_diagonal() {
-    let mut board = tui_tac_toe::empty_board();
-    board[2] = Player::Computer;
-    board[4] = Player::Computer;
-    board[6] = Player::Computer;
-    match tui_tac_toe::check_winner(board) {
+    let mut game = Game::new();
+    game.make_move(Move { x: 0, y: 0 }, Player::Computer);
+    game.make_move(Move { x: 0, y: 1 }, Player::Computer);
+    game.make_move(Move { x: 0, y: 2 }, Player::Computer);
+    match game.check_winner() {
         Player::Computer => assert!(true),
         _ => assert!(false),
     }
