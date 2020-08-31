@@ -16,7 +16,6 @@ impl Player {
         }
     }
 
-
     fn to_winner(&self) -> Winner {
         match self {
             Player::Human => Winner::Human,
@@ -52,7 +51,9 @@ pub struct Game {
 
 impl Game {
     pub fn new() -> Game {
-        Game { moves: Vec::with_capacity(9) }
+        Game {
+            moves: Vec::with_capacity(9),
+        }
     }
 
     pub fn is_move_valid(&self, input: &Move) -> bool {
@@ -101,7 +102,7 @@ impl Game {
             return board[6].to_winner();
         }
         if self.has_ended() {
-            return Winner::Draw
+            return Winner::Draw;
         }
         Winner::Nobody
     }

@@ -9,7 +9,7 @@ use termion::raw::IntoRawMode;
 use termion::raw::RawTerminal;
 
 use tui_tac_toe;
-use tui_tac_toe::{ Game, Move, Player, Winner };
+use tui_tac_toe::{Game, Move, Player, Winner};
 
 const WELCOME_MESSAGE: &str = "Welcome to old woman's game!\n\rHere you will try to save humankind from being enslaved by a\n\rmighty invincible artificial intelligence.\n\rGodspeed!\n\r\n\r\n\r";
 const PLAYER_WIN_MESSAGE: &str = "Congratulations! You have saved us from extinction!";
@@ -123,7 +123,7 @@ fn main() -> Result<(), io::Error> {
                     }
                 }
             }
-            _ => {},
+            _ => {}
         }
 
         write_board(&mut stdout, game.build_board(), position, winner_status);

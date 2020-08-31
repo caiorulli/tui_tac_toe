@@ -1,5 +1,5 @@
 use tui_tac_toe;
-use tui_tac_toe::{ Game, Winner };
+use tui_tac_toe::{Game, Winner};
 
 #[test]
 fn check_winner_empty_board() {
