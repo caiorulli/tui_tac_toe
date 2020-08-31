@@ -9,13 +9,12 @@ use termion::raw::IntoRawMode;
 use termion::raw::RawTerminal;
 
 use tui_tac_toe;
-use tui_tac_toe::Game;
-use tui_tac_toe::Move;
-use tui_tac_toe::Player;
+use tui_tac_toe::{ Game, Move, Player, Winner };
 
 const WELCOME_MESSAGE: &str = "Welcome to old woman's game!\n\rHere you will try to save humankind from being enslaved by a\n\rmighty invincible artificial intelligence.\n\rGodspeed!\n\r\n\r\n\r";
 const PLAYER_WIN_MESSAGE: &str = "Congratulations! You have saved us from extinction!";
 const AI_WIN_MESSAGE: &str = "You lost! Humanity is doomed now...";
+const DRAW_MESSAGE: &str = "It's a draw! You live to fight another day.";
 const NO_WIN_MESSAGE: &str = "Nobody won just yet. The battle rages on!";
 
 fn write_board(
@@ -43,8 +42,8 @@ fn make_computer_move(game: &Game) -> Move {
     loop {
         let computer_move_x = rand::thread_rng().gen_range(0, 3);
         let computer_move_y = rand::thread_rng().gen_range(0, 3);
-        let result = Move::new(computer_move_x as usize, computer_move_y as usize).unwrap();
-        if game.validate_move(&result) {
+        let result = (computer_move_x as usize, computer_move_y as usize);
+        if game.is_move_valid(&result) {
             break result;
         }
     }
@@ -60,7 +59,7 @@ fn main() -> Result<(), io::Error> {
     let mut position: (u16, u16) = (board_position.0, board_position.1);
     let mut winner_status = "";
 
-    write_board(&mut stdout, game.board, position, winner_status);
+    write_board(&mut stdout, game.build_board(), position, winner_status);
 
     for c in stdin.keys() {
         match c.unwrap() {
@@ -91,35 +90,43 @@ fn main() -> Result<(), io::Error> {
             Key::Char(' ') => {
                 let position_x = (position.0 - board_position.0) / 4;
                 let position_y = (position.1 - board_position.1) / 2;
-                let result_move = Move::new(position_x as usize, position_y as usize).unwrap();
+                let result_move = (position_x as usize, position_y as usize);
 
-                if game.validate_move(&result_move) {
-                    game.make_move(result_move, Player::Human);
-                    game.make_move(make_computer_move(&game), Player::Computer);
+                if game.is_move_valid(&result_move) {
+                    game.apply_move(result_move);
+                    if !game.has_ended() {
+                        game.apply_move(make_computer_move(&game));
+                    }
 
                     match game.check_winner() {
-                        Player::Human => {
+                        Winner::Human => {
                             winner_status = PLAYER_WIN_MESSAGE;
-                            write_board(&mut stdout, game.board, position, winner_status);
+                            write_board(&mut stdout, game.build_board(), position, winner_status);
                             write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
                             break;
                         }
-                        Player::Computer => {
+                        Winner::Computer => {
                             winner_status = AI_WIN_MESSAGE;
-                            write_board(&mut stdout, game.board, position, winner_status);
+                            write_board(&mut stdout, game.build_board(), position, winner_status);
                             write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
                             break;
                         }
-                        Player::Nobody => {
+                        Winner::Draw => {
+                            winner_status = DRAW_MESSAGE;
+                            write_board(&mut stdout, game.build_board(), position, winner_status);
+                            write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
+                            break;
+                        }
+                        Winner::Nobody => {
                             winner_status = NO_WIN_MESSAGE;
                         }
                     }
                 }
             }
-            _ => println!("General Kenobi!"),
+            _ => {},
         }
 
-        write_board(&mut stdout, game.board, position, winner_status);
+        write_board(&mut stdout, game.build_board(), position, winner_status);
     }
 
     Ok(())
