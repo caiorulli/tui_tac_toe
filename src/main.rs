@@ -39,13 +39,16 @@ fn write_board(
 }
 
 fn make_computer_move(game: &Game) -> Move {
-    loop {
-        let computer_move_x = rand::thread_rng().gen_range(0, 3);
-        let computer_move_y = rand::thread_rng().gen_range(0, 3);
-        let result = (computer_move_x as usize, computer_move_y as usize);
-        if game.is_move_valid(&result) {
-            break result;
-        }
+    match tui_tac_toe::minimax(game) {
+        (_, Some(best_move)) => best_move,
+        _ => loop {
+            let computer_move_x = rand::thread_rng().gen_range(0, 3);
+            let computer_move_y = rand::thread_rng().gen_range(0, 3);
+            let result = (computer_move_x as usize, computer_move_y as usize);
+            if game.is_move_valid(&result) {
+                break result;
+            }
+        },
     }
 }
 

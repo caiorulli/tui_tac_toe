@@ -25,14 +25,6 @@ impl Player {
     }
 }
 
-#[derive(Debug, PartialEq)]
-pub enum Winner {
-    Nobody,
-    Human,
-    Computer,
-    Draw,
-}
-
 impl Display for Player {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match *self {
@@ -43,8 +35,39 @@ impl Display for Player {
     }
 }
 
+#[derive(Debug, PartialEq)]
+pub enum Winner {
+    Nobody,
+    Human,
+    Computer,
+    Draw,
+}
+
+impl Winner {
+    fn score(&self) -> i32 {
+        match self {
+            Winner::Human => -10,
+            Winner::Computer => 10,
+            _ => 0,
+        }
+    }
+}
+
 pub type Move = (usize, usize);
 
+const POSSIBLE_MOVES: [Move; 9] = [
+    (0, 0),
+    (0, 1),
+    (0, 2),
+    (1, 0),
+    (1, 1),
+    (1, 2),
+    (2, 0),
+    (2, 1),
+    (2, 2),
+];
+
+#[derive(Clone)]
 pub struct Game {
     moves: Vec<Move>,
 }
@@ -105,5 +128,50 @@ impl Game {
             return Winner::Draw;
         }
         Winner::Nobody
+    }
+
+    fn possible_moves(&self) -> Vec<Move> {
+        POSSIBLE_MOVES
+            .to_vec()
+            .into_iter()
+            .filter(|elem| !self.moves.contains(elem))
+            .collect()
+    }
+
+    fn player_turn(&self) -> Player {
+        let turn = self.moves.len();
+        if turn % 2 == 0 {
+            return Player::Human;
+        }
+        Player::Computer
+    }
+}
+
+pub fn minimax(game: &Game) -> (i32, Option<Move>) {
+    let winner = game.check_winner();
+    if winner != Winner::Nobody {
+        return (winner.score(), None);
+    }
+    let mut options: Vec<(i32, Move)> = vec![];
+
+    for possible_move in game.possible_moves().into_iter() {
+        let mut possible_game = game.clone();
+        possible_game.apply_move(possible_move);
+        let (game_score, _) = minimax(&possible_game);
+        options.push((game_score, possible_move));
+    }
+
+    if game.player_turn() == Player::Computer {
+        let (max_score, best_move) = options
+            .into_iter()
+            .max_by(|(score_a, _), (score_b, _)| score_a.cmp(score_b))
+            .unwrap();
+        return (max_score, Some(best_move));
+    } else {
+        let (min_score, best_move) = options
+            .into_iter()
+            .min_by(|(score_a, _), (score_b, _)| score_a.cmp(score_b))
+            .unwrap();
+        return (min_score, Some(best_move));
     }
 }
