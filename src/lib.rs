@@ -70,12 +70,14 @@ const POSSIBLE_MOVES: [Move; 9] = [
 #[derive(Clone)]
 pub struct Game {
     moves: Vec<Move>,
+    pub turn: Player,
 }
 
 impl Game {
-    pub fn new() -> Game {
+    pub fn new(first_player: Player) -> Game {
         Game {
             moves: Vec::with_capacity(9),
+            turn: first_player,
         }
     }
 
@@ -84,7 +86,8 @@ impl Game {
     }
 
     pub fn apply_move(&mut self, input: Move) {
-        self.moves.push(input)
+        self.moves.push(input);
+        self.turn = self.turn.next();
     }
 
     pub fn build_board(&self) -> [Player; 9] {
@@ -97,7 +100,7 @@ impl Game {
         board
     }
 
-    pub fn has_ended(&self) -> bool {
+    fn has_ended(&self) -> bool {
         self.moves.len() == 9
     }
 
@@ -137,14 +140,6 @@ impl Game {
             .filter(|elem| !self.moves.contains(elem))
             .collect()
     }
-
-    fn player_turn(&self) -> Player {
-        let turn = self.moves.len();
-        if turn % 2 == 0 {
-            return Player::Human;
-        }
-        Player::Computer
-    }
 }
 
 pub fn minimax(game: &Game) -> (i32, Option<Move>) {
@@ -161,7 +156,7 @@ pub fn minimax(game: &Game) -> (i32, Option<Move>) {
         options.push((game_score, possible_move));
     }
 
-    if game.player_turn() == Player::Computer {
+    if game.turn == Player::Computer {
         let (max_score, best_move) = options
             .into_iter()
             .max_by(|(score_a, _), (score_b, _)| score_a.cmp(score_b))

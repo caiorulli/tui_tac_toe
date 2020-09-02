@@ -1,6 +1,6 @@
 use rand::Rng;
 use std::io;
-use std::io::Write;
+use std::{thread, io::Write, sync::mpsc};
 use termion::clear;
 use termion::cursor;
 use termion::event::Key;
@@ -53,7 +53,7 @@ fn make_computer_move(game: &Game) -> Move {
 }
 
 fn main() -> Result<(), io::Error> {
-    let mut game = Game::new();
+    let mut game = Game::new(Player::Human);
 
     let stdin = io::stdin();
     let mut stdout = io::stdout().into_raw_mode().unwrap();
@@ -62,75 +62,82 @@ fn main() -> Result<(), io::Error> {
     let mut position: (u16, u16) = (board_position.0, board_position.1);
     let mut winner_status = "";
 
-    write_board(&mut stdout, game.build_board(), position, winner_status);
+    let (tx, rx) = mpsc::channel();
 
-    for c in stdin.keys() {
-        match c.unwrap() {
-            Key::Char('q') => {
-                write!(stdout, "{}{}", clear::All, cursor::Goto(1, 1)).unwrap();
-                break;
-            }
-            Key::Char('l') => {
-                if (position.0 - board_position.0) / 4 < 2 {
-                    position.0 += 4;
-                }
-            }
-            Key::Char('h') => {
-                if (position.0 - board_position.0) / 4 > 0 {
-                    position.0 -= 4;
-                }
-            }
-            Key::Char('j') => {
-                if (position.1 - board_position.1) / 2 < 2 {
-                    position.1 += 2;
-                }
-            }
-            Key::Char('k') => {
-                if (position.1 - board_position.1) / 2 > 0 {
-                    position.1 -= 2;
-                }
-            }
-            Key::Char(' ') => {
-                let position_x = (position.0 - board_position.0) / 4;
-                let position_y = (position.1 - board_position.1) / 2;
-                let result_move = (position_x as usize, position_y as usize);
+    thread::spawn(move || {
+        for c in stdin.keys() {
+            tx.send(c.unwrap()).unwrap();
+        }
+    });
 
-                if game.is_move_valid(&result_move) {
-                    game.apply_move(result_move);
-                    if !game.has_ended() {
-                        game.apply_move(make_computer_move(&game));
-                    }
+    while game.check_winner() == Winner::Nobody {
+        write_board(&mut stdout, game.build_board(), position, winner_status);
 
-                    match game.check_winner() {
-                        Winner::Human => {
-                            winner_status = PLAYER_WIN_MESSAGE;
-                            write_board(&mut stdout, game.build_board(), position, winner_status);
-                            write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
-                            break;
-                        }
-                        Winner::Computer => {
-                            winner_status = AI_WIN_MESSAGE;
-                            write_board(&mut stdout, game.build_board(), position, winner_status);
-                            write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
-                            break;
-                        }
-                        Winner::Draw => {
-                            winner_status = DRAW_MESSAGE;
-                            write_board(&mut stdout, game.build_board(), position, winner_status);
-                            write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
-                            break;
-                        }
-                        Winner::Nobody => {
-                            winner_status = NO_WIN_MESSAGE;
-                        }
+        if game.turn == Player::Human {
+            let input_char = rx.recv().unwrap();
+
+            match input_char {
+                Key::Char('q') => {
+                    write!(stdout, "{}{}", clear::All, cursor::Goto(1, 1)).unwrap();
+                    break;
+                }
+                Key::Char('l') => {
+                    if (position.0 - board_position.0) / 4 < 2 {
+                        position.0 += 4;
                     }
                 }
+                Key::Char('h') => {
+                    if (position.0 - board_position.0) / 4 > 0 {
+                        position.0 -= 4;
+                    }
+                }
+                Key::Char('j') => {
+                    if (position.1 - board_position.1) / 2 < 2 {
+                        position.1 += 2;
+                    }
+                }
+                Key::Char('k') => {
+                    if (position.1 - board_position.1) / 2 > 0 {
+                        position.1 -= 2;
+                    }
+                }
+                Key::Char(' ') => {
+                    let position_x = (position.0 - board_position.0) / 4;
+                    let position_y = (position.1 - board_position.1) / 2;
+                    let result_move = (position_x as usize, position_y as usize);
+
+                    if game.is_move_valid(&result_move) {
+                        game.apply_move(result_move);
+                    }
+                }
+                _ => {}
             }
-            _ => {}
+        } else {
+            game.apply_move(make_computer_move(&game));
         }
 
-        write_board(&mut stdout, game.build_board(), position, winner_status);
+        match game.check_winner() {
+            Winner::Human => {
+                winner_status = PLAYER_WIN_MESSAGE;
+                write_board(&mut stdout, game.build_board(), position, winner_status);
+                write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
+            }
+            Winner::Computer => {
+                winner_status = AI_WIN_MESSAGE;
+                write_board(&mut stdout, game.build_board(), position, winner_status);
+                write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
+            }
+            Winner::Draw => {
+                winner_status = DRAW_MESSAGE;
+                write_board(&mut stdout, game.build_board(), position, winner_status);
+                write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
+            }
+            Winner::Nobody => {
+                winner_status = NO_WIN_MESSAGE;
+            }
+        }
     }
+
 
     Ok(())
 }
