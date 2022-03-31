@@ -1,6 +1,6 @@
 use rand::Rng;
 use std::io;
-use std::{thread, io::Write, sync::mpsc};
+use std::{io::Write, sync::mpsc, thread};
 use termion::clear;
 use termion::cursor;
 use termion::event::Key;
@@ -56,7 +56,7 @@ fn main() -> Result<(), io::Error> {
     let mut game = Game::new(Player::Human);
 
     let stdin = io::stdin();
-    let mut stdout = io::stdout().into_raw_mode().unwrap();
+    let mut stdout = io::stdout().into_raw_mode()?;
 
     let board_position: (u16, u16) = (3, 8);
     let mut position: (u16, u16) = (board_position.0, board_position.1);
@@ -78,7 +78,7 @@ fn main() -> Result<(), io::Error> {
 
             match input_char {
                 Key::Char('q') => {
-                    write!(stdout, "{}{}", clear::All, cursor::Goto(1, 1)).unwrap();
+                    write!(stdout, "{}{}", clear::All, cursor::Goto(1, 1))?;
                     break;
                 }
                 Key::Char('l') => {
@@ -120,24 +120,23 @@ fn main() -> Result<(), io::Error> {
             Winner::Human => {
                 winner_status = PLAYER_WIN_MESSAGE;
                 write_board(&mut stdout, game.build_board(), position, winner_status);
-                write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
+                write!(stdout, "{}", cursor::Goto(1, 17))?
             }
             Winner::Computer => {
                 winner_status = AI_WIN_MESSAGE;
                 write_board(&mut stdout, game.build_board(), position, winner_status);
-                write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
+                write!(stdout, "{}", cursor::Goto(1, 17))?
             }
             Winner::Draw => {
                 winner_status = DRAW_MESSAGE;
                 write_board(&mut stdout, game.build_board(), position, winner_status);
-                write!(stdout, "{}", cursor::Goto(1, 17)).unwrap();
+                write!(stdout, "{}", cursor::Goto(1, 17))?
             }
             Winner::Nobody => {
                 winner_status = NO_WIN_MESSAGE;
             }
         }
     }
-
 
     Ok(())
 }

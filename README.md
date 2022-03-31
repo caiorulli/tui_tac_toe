@@ -1,16 +1,17 @@
-#+TITLE: TUI-Tac-Toe
+# TUI-Tac-Toe
 
 Fire it up to join in an unforgettable tic-tac-toe experience in your terminal!
 
 If you downloaded the source code:
-#+BEGIN_SRC sh
+
+``` sh
 cargo run
-#+END_SRC
+```
 
 There are some tests! :D
 
-#+BEGIN_SRC sh
+``` sh
 cargo test
-#+END_SRC
+```
 
 Pretty much a work in progress. Lots of room for improvement! Feel free to contribute if you'd like to! :D

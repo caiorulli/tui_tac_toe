@@ -1,15 +1,14 @@
-use tui_tac_toe;
-use tui_tac_toe::{Game, Winner};
+use tui_tac_toe::{self, Game, Player, Winner};
 
 #[test]
 fn check_winner_empty_board() {
-    let game = Game::new();
+    let game = Game::new(Player::Human);
     assert_eq!(game.check_winner(), Winner::Nobody);
 }
 
 #[test]
 fn check_winner_human_wins() {
-    let mut game = Game::new();
+    let mut game = Game::new(Player::Human);
     game.apply_move((0, 0));
     game.apply_move((1, 0));
     game.apply_move((0, 1));
@@ -20,7 +19,7 @@ fn check_winner_human_wins() {
 
 #[test]
 fn check_winner_computer_wins() {
-    let mut game = Game::new();
+    let mut game = Game::new(Player::Human);
     game.apply_move((0, 0));
     game.apply_move((2, 2));
     game.apply_move((1, 1));
@@ -32,7 +31,7 @@ fn check_winner_computer_wins() {
 
 #[test]
 fn check_winner_draw() {
-    let mut game = Game::new();
+    let mut game = Game::new(Player::Human);
     game.apply_move((0, 0));
     game.apply_move((0, 1));
     game.apply_move((0, 2));
